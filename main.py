@@ -3,6 +3,8 @@ from functions.revenue import *
 from functions.earnings import *
 from functions.margins import *
 from functions.combine import *
+from functions.cashflow import *
+from functions.valuation import *
 def get_multiline_input(prompt):
     print(prompt)
     lines = []
@@ -30,7 +32,19 @@ def main():
     )
     margin_score = margins_interpreter(margins_text)
 
-    final = combine_scores(rev_score, earn_score, margin_score)
+    cashflow_text = get_multiline_input(
+    "\nPaste your cash flow data (press Enter twice when done):"
+    )
+
+    cashflow_score = cashflow_interpreter(cashflow_text)
+
+    pe_text = get_multiline_input(
+    "\nPaste P/E ratio (press Enter twice when done):"
+)
+
+    pe_score = pe_interpreter(pe_text)
+
+    final = combine_scores(rev_score, earn_score, margin_score, cashflow_score, pe_score)
 
     print("\nFINAL DECISION:", final)
 

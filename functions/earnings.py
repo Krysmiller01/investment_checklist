@@ -23,7 +23,11 @@ def parse_earnings(text):
             # Convert decline to negative growth
             if direction == "decline":
                 growth = -growth
-
+            if growth > 100:
+                growth = 100
+            elif growth < -100:
+                growth = -100
+                
             data[year] = {
                 "eps": eps,
                 "growth": growth

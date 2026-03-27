@@ -27,6 +27,8 @@ def parse_margins(text):
 def score_margins(data):
     margins = [entry["margin"] for entry in data]
 
+    volatility = max(margins) - min(margins)
+
     improving = 0
     declining = 0
 
@@ -40,8 +42,11 @@ def score_margins(data):
 
     print("\nMargins:", margins)
     print("Average margin:", round(avg_margin, 2))
+    print("Margin volatility:", round(volatility, 2))
 
     # Scoring logic
+    if volatility > 30:
+        return "Yikes"
     if avg_margin > 20 and improving > declining:
         return "Good"
     elif avg_margin < 5 and declining > improving:
