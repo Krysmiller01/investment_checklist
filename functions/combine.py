@@ -20,7 +20,7 @@ def combine_scores(revenue_score, earnings_score, margin_score, cashflow_score, 
     print("Cash Flow:", cashflow_score)
     print("P/E:", pe_score)
     if pe_score == "Yikes":
-        print("⚠️ Warning: High valuation (P/E)")
+        print("⚠️ Warning: High valuation (P/E) - Too Expensive to go forward")
     print("Weighted Score (goal:>11):", round(total, 2))
 
     # Final classification
