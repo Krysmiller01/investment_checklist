@@ -25,8 +25,10 @@ def combine_scores(revenue_score, earnings_score, margin_score, cashflow_score, 
 
     # Final classification
     if total >= 11:
-        return "Strong"
+        final = "Strong"
     elif total >= 7:
-        return "Watch"
+        final = "Watch"
     else:
-        return "Avoid"
+        final = "Avoid"
+    
+    return final, total

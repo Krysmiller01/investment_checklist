@@ -5,6 +5,7 @@ from functions.margins import *
 from functions.combine import *
 from functions.cashflow import *
 from functions.valuation import *
+from functions.logger import *
 def get_multiline_input(prompt):
     print(prompt)
     lines = []
@@ -17,6 +18,8 @@ def get_multiline_input(prompt):
 
 
 def main():
+    ticker = input("Enter ticker (e.g. DOCU): ").strip().upper()
+    industry = input("Enter industry: ")
     revenue_text = get_multiline_input(
         "Paste your revenue data (press Enter twice when done):"
     )
@@ -44,9 +47,25 @@ def main():
 
     pe_score = pe_interpreter(pe_text)
 
-    final = combine_scores(rev_score, earn_score, margin_score, cashflow_score, pe_score)
+    final, total = combine_scores(rev_score, earn_score, margin_score, cashflow_score, pe_score)
 
     print("\nFINAL DECISION:", final)
+
+    scores = {
+    "revenue": rev_score,
+    "earnings": earn_score,
+    "margins": margin_score,
+    "cashflow": cashflow_score,
+    "pe": pe_score
+}
+    confirm_write = input("Do you want to save this into the csv? (y/n): ").strip().lower()
+
+    if confirm_write == "y":
+        log_result(ticker, industry, scores, final, total)
+        print(f"Saved: {ticker} | {industry} | {final}")
+        print("Saved successfully.")
+    else:
+        print("Not saved.")
 
 if __name__ == "__main__":
     main()
