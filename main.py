@@ -19,6 +19,7 @@ def get_multiline_input(prompt):
 
 def main():
     ticker = input("Enter ticker (e.g. DOCU): ").strip().upper()
+    current_price = input("Enter current price: ")
     industry = input("Enter industry: ")
     revenue_text = get_multiline_input(
         "Paste your revenue data (press Enter twice when done):"
@@ -45,7 +46,7 @@ def main():
     "\nPaste P/E ratio (press Enter twice when done):"
 )
 
-    pe_score = pe_interpreter(pe_text)
+    pe_score = pe_interpreter(pe_text, earn_score)
 
     final, total = combine_scores(rev_score, earn_score, margin_score, cashflow_score, pe_score)
 
@@ -61,8 +62,8 @@ def main():
     confirm_write = input("Do you want to save this into the csv? (y/n): ").strip().lower()
 
     if confirm_write == "y":
-        log_result(ticker, industry, scores, final, total)
-        print(f"Saved: {ticker} | {industry} | {final}")
+        log_result(ticker, current_price, industry, scores, final, total)
+        print(f"Saved: {ticker} | {current_price} | {industry} | {final}")
         print("Saved successfully.")
     else:
         print("Not saved.")

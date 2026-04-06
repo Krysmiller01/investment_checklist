@@ -1,38 +1,53 @@
 import re
 
-def parse_cashflow(text):
-    ocf_match = re.search(r"OCF\s*=\s*([-\d,]+)", text)
-    capex_match = re.search(r"CapEx\s*=\s*([-\d,]+)", text)
+def parse_fcf(text):
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-    if not ocf_match or not capex_match:
+    try:
+        values = [float(line.replace(",", "")) for line in lines]
+    except:
         return None
 
-    ocf = int(ocf_match.group(1).replace(",", ""))
-    capex = int(capex_match.group(1).replace(",", ""))
+    return values
 
-    return ocf, capex
-
-def calculate_fcf(ocf, capex):
-    return ocf - capex
-
-def cashflow_interpreter(text):
-    parsed = parse_cashflow(text)
-
-    if not parsed:
-        print("Could not parse cash flow data.")
+def score_fcf(values):
+    if not values or len(values) < 4:
+        print("Not enough FCF data.")
         return "Neutral"
 
-    ocf, capex = parsed
-    fcf = calculate_fcf(ocf, capex)
+    # Ignore TTM → use last 4 annual values
+    fcf_values = values[1:5]  # [2025, 2024, 2023, 2022]
 
-    print("\nOCF:", ocf)
-    print("CapEx:", capex)
-    print("FCF:", fcf)
+    # Reverse so oldest → newest
+    fcf_values = list(reversed(fcf_values))  # [2022 → 2025]
 
-    # Simple scoring
-    if fcf > 0:
+    improving = 0
+
+    for i in range(1, len(fcf_values)):
+        if fcf_values[i] > fcf_values[i-1]:
+            improving += 1
+
+    avg_fcf = sum(fcf_values) / len(fcf_values)
+
+    print("\nFCF values:", fcf_values)
+    print("Average FCF:", round(avg_fcf, 2))
+
+    if all(f > 0 for f in fcf_values) and improving >= 2:
         return "Good"
-    elif fcf < 0:
+    elif any(f < 0 for f in fcf_values):
         return "Yikes"
     else:
         return "Neutral"
+    
+def cashflow_interpreter(text):
+    values = parse_fcf(text)
+
+    if not values:
+        print("Could not parse FCF data.")
+        return "Neutral"
+
+    score = score_fcf(values)
+
+    print("\nFCF Score:", score)
+
+    return score

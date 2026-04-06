@@ -3,40 +3,44 @@ import re
 def parse_earnings(text):
     data = {}
 
-    lines = text.split("\n")
-
-    pattern = re.compile(
-        r"(\d{4}) annual EPS was \$(-?\d+\.\d+), a (\d+\.?\d*)% (increase|decline)"
-    )
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
     for line in lines:
-        if "annual EPS" not in line:
+        parts = line.split()
+
+        if len(parts) < 2:
             continue
 
-        match = pattern.search(line)
-        if match:
-            year = match.group(1)
-            eps = float(match.group(2))
-            growth = float(match.group(3))
-            direction = match.group(4)
+        year = parts[0]
+        eps_str = parts[1]
 
-            # Convert decline to negative growth
-            if direction == "decline":
-                growth = -growth
-            if growth > 100:
-                growth = 100
-            elif growth < -100:
-                growth = -100
-                
-            data[year] = {
-                "eps": eps,
-                "growth": growth
-            }
+        eps = float(eps_str.replace("$", "").replace(",", ""))
+
+        data[year] = {"eps": eps}
+
+    return data
+
+def add_earnings_growth(data):
+    years = sorted(data.keys(), key=int)
+
+    for i in range(1, len(years)):
+        prev = data[years[i-1]]["eps"]
+        curr = data[years[i]]["eps"]
+
+        # 🔴 Handle negative / zero EPS (important)
+        if prev <= 0:
+            growth = 0
+        else:
+            growth = ((curr - prev) / prev) * 100
+
+        data[years[i]]["growth"] = round(growth, 2)
+
+    data[years[0]]["growth"] = 0
 
     return data
 
 def score_earnings_quality(data):
-    years = sorted(data.keys())
+    years = sorted(data.keys(), key=int)[-4:]
     
     eps_values = [data[y]["eps"] for y in years]
     growths = [data[y]["growth"] for y in years]
@@ -54,7 +58,7 @@ def score_earnings_quality(data):
     print("Average growth:", round(avg_growth, 2))
 
     # Scoring logic
-    if improving_eps >= 2 and avg_growth > 0:
+    if improving_eps >= 2 and avg_growth > 3:
         return "Good"
     elif improving_eps == 0 and avg_growth < 0:
         return "Yikes"
@@ -64,6 +68,7 @@ def score_earnings_quality(data):
 def earnings_interpreter(text):
 
     data = parse_earnings(text)
+    data = add_earnings_growth(data)
     score = score_earnings_quality(data)
 
     print("\nParsed Earnings Data:")

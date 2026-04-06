@@ -3,32 +3,42 @@ import re
 def parse_revenue(text):
     data = {}
 
-    lines = text.split("\n")
-
-    pattern = re.compile(
-        r"annual revenue for (\d{4}) was \$(\d+\.\d+)B, a (\d+\.?\d*)% increase"
-    )
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
     for line in lines:
-        if "annual revenue" not in line:
+        parts = line.split()
+
+        if len(parts) < 2:
             continue
 
-        match = pattern.search(line)
-        if match:
-            year = match.group(1)
-            revenue = float(match.group(2))
-            growth = float(match.group(3))
+        year = parts[0]
+        revenue_str = parts[1]
 
-            data[year] = {
-                "revenue": revenue,
-                "growth": growth
-            }
+        # Clean revenue: remove $, commas
+        revenue = float(revenue_str.replace("$", "").replace(",", ""))
+
+        data[year] = {"revenue": revenue}
 
     return data
 
+def add_growth(data):
+    years = sorted(data.keys(), key=int)
+
+    for i in range(1, len(years)):
+        prev = data[years[i-1]]["revenue"]
+        curr = data[years[i]]["revenue"]
+        
+
+        growth = ((curr - prev) / prev) * 100
+        data[years[i]]["growth"] = round(growth, 2)
+
+    # First year has no growth
+    data[years[0]]["growth"] = 0
+
+    return data
 
 def score_growth_quality(data):
-    years = sorted(data.keys())
+    years = sorted(data.keys(), key=int)[-4:]
     
     growths = [data[year]["growth"] for year in years]
 
@@ -57,6 +67,7 @@ def score_growth_quality(data):
 def revenue_interpreter(text): 
     
     data = parse_revenue(text)
+    data = add_growth(data)
     score = score_growth_quality(data)
 
     print("\nParsed Data:")

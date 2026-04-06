@@ -1,2 +1,9 @@
-Date,Ticker,Industry,Revenue,Earnings,Margins,CashFlow,PE,FinalScore,WeightedScore
-2026-03-27,DOCU,Technology,Neutral,Good,Yikes,Good,Neutral,Watch,9.5
+Date,Ticker,Price,Industry,Revenue,Earnings,Margins,CashFlow,PE,FinalScore,WeightedScore
+2026-04-06,PFE,28.10,Healthcare,Neutral,Neutral,Yikes,Good,Good,Watch,8.5
+2026-04-06,ENB,53.82,Energy,Yikes,Good,Neutral,Neutral,Good,Watch,8.5
+2026-04-06,MO,65.82,Consumer Staples,Neutral,Good,Yikes,Good,Good,Watch,10.0
+2026-04-06,VALE,16.12,International,Neutral,Yikes,Yikes,Neutral,Yikes,Avoid,3.5
+2026-04-06,ET,19.04,Energy,Yikes,Neutral,Yikes,Good,Good,Watch,7.5
+2026-04-06,ABEV,2.98,International,Yikes,Neutral,Neutral,Good,Good,Watch,9.5
+2026-04-06,DEO,73.88,Consumer Staples,Yikes,Neutral,Neutral,Good,Good,Watch,9.5
+2026-04-06,CCI,86.93,REIT,Yikes,Neutral,Yikes,Good,Good,Watch,7.5

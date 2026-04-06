@@ -1,30 +1,37 @@
 def parse_margins(text):
     lines = [line.strip() for line in text.split("\n") if line.strip()]
 
+    if not lines:
+        return []
+
     data = []
 
-    # Skip header (first 4 lines)
-    i = 4
+    # Skip header if present
+    if "Date" in lines[0]:
+        lines = lines[1:]
 
-    while i < len(lines):
-        date = lines[i]
-        revenue = lines[i+1]
-        net_income = lines[i+2]
-        margin = lines[i+3]
+    for line in lines:
+        parts = line.split()
 
-        # Clean margin → float
-        margin_value = float(margin.replace("%", ""))
+        if len(parts) < 4:
+            continue
+
+        date = parts[0]
+        margin_str = parts[3]
+
+        margin = float(margin_str.replace("%", ""))
 
         data.append({
             "date": date,
-            "margin": margin_value
+            "margin": margin
         })
-
-        i += 4
 
     return data
 
 def score_margins(data):
+    # Sort by date (oldest → newest)
+    data = sorted(data, key=lambda x: x["date"])
+
     margins = [entry["margin"] for entry in data]
 
     volatility = max(margins) - min(margins)
@@ -44,9 +51,10 @@ def score_margins(data):
     print("Average margin:", round(avg_margin, 2))
     print("Margin volatility:", round(volatility, 2))
 
-    # Scoring logic
+    # 🔥 Volatility penalty first
     if volatility > 30:
         return "Yikes"
+
     if avg_margin > 20 and improving > declining:
         return "Good"
     elif avg_margin < 5 and declining > improving:
@@ -56,6 +64,12 @@ def score_margins(data):
 
 def margins_interpreter(text):
     data = parse_margins(text)
+
+    if not data:
+        print("No margin data.")
+        return "Neutral"
+
+    
     score = score_margins(data)
 
     print("\nParsed Margin Data:")

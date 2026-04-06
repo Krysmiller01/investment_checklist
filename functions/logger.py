@@ -2,7 +2,7 @@ import csv
 from datetime import datetime
 import os
 
-def log_result(company, industry, scores, final_score, weighted_score):
+def log_result(company, price, industry, scores, final_score, weighted_score):
     file_exists = os.path.isfile("results.csv")
 
     with open("results.csv", mode="a", newline="") as file:
@@ -13,6 +13,7 @@ def log_result(company, industry, scores, final_score, weighted_score):
             writer.writerow([
                 "Date",
                 "Ticker",
+                "Price",
                 "Industry",
                 "Revenue",
                 "Earnings",
@@ -26,6 +27,7 @@ def log_result(company, industry, scores, final_score, weighted_score):
         writer.writerow([
             datetime.now().strftime("%Y-%m-%d"),
             company,
+            price,
             industry,
             scores["revenue"],
             scores["earnings"],
